@@ -22,6 +22,7 @@ from langchain_core.runnables import RunnableLambda
 from safety.policy import check_message
 from safety.scope import classify_scope
 from safety.telemetry import record_scope, UsageTrace
+from safety import usage
 from safety.limits import enforce_quota
 from langchain_core.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, START, END
@@ -46,6 +47,16 @@ async def pilot_access(request: Request, call_next):
             await authenticate(request)
         except HTTPException as exc:
             return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail}, headers=exc.headers)
+    if request.method == "POST" and request.url.path in usage.OPERATIONS:
+        token = usage.start_usage(request)
+        status = 500
+        try:
+            response = await call_next(request)
+            status = response.status_code
+            return response
+        finally:
+            await usage.finish_usage(status)
+            usage.current_usage.reset(token)
     return await call_next(request)
 
 app.add_middleware(
@@ -85,6 +96,7 @@ async def transcribe(
         raise HTTPException(422, "Upload audio between 1 byte and 25 MB.")
     enforce_quota(request)
     await enforce_daily_quota(request)
+    usage.add_audio_duration(audio_bytes)
     arabic = language == "ar"
     key = os.getenv("GROQ_API_KEY" if arabic else "SARVAM_API_KEY")
     if not key:

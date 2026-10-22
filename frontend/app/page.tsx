@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { deviceId } from "../lib/identity";
 import { API_BASE, ensureServiceReady } from "../lib/service";
 import {
   MAX_RECORDING_MS,
@@ -66,9 +67,11 @@ class RequestError extends Error {
   constructor(message: string, readonly code?: string) { super(message); }
 }
 
-async function request(path: string, body: unknown, form = false, accessCode = "", onStarting?: (value: boolean) => void) {
+async function request(path: string, body: unknown, form = false, accessCode = "", onStarting?: (value: boolean) => void, usageName = "") {
   await ensureServiceReady(onStarting);
   const headers: Record<string, string> = form ? {} : { "Content-Type": "application/json" };
+  headers["X-Device-ID"] = deviceId();
+  if (usageName.trim()) headers["X-Usage-Name"] = encodeURIComponent(usageName.trim());
   if (accessCode.trim()) headers.Authorization = `Bearer ${accessCode.trim()}`;
   const response = await fetch(`${API_BASE}${path}`, {
     method: "POST",
@@ -88,6 +91,7 @@ async function request(path: string, body: unknown, form = false, accessCode = "
 }
 
 export default function Home() {
+  const [usageName, setUsageName] = useState("");
   const [language, setLanguage] = useState("ta-IN"),
     [persona, setPersona] = useState("office"),
     [target, setTarget] = useState("email"),
@@ -134,7 +138,7 @@ export default function Home() {
     setWarning(false);
   }
   async function callApi(path: string, body: unknown, form = false) {
-    return request(path, body, form, pilotCode, setStartingService);
+    return request(path, body, form, pilotCode, setStartingService, usageName);
   }
   async function unlockPilot() {
     setBusy("access"); setError("");
@@ -372,6 +376,10 @@ export default function Home() {
                 <span className="step">1</span>
                 <h2>What would you like to say?</h2>
               </div>
+              <label className="usage-name">Your name (optional)
+                <input autoComplete="off" maxLength={60} value={usageName} onChange={e => setUsageName(e.target.value)} disabled={disabled} placeholder="First name or nickname" aria-describedby="usage-note" />
+              </label>
+              <p id="usage-note" className="usage-note">We keep usage totals for 90 days using an anonymous browser ID. Add a name only if you want the app owner to see it with your totals. Messages and recordings are not stored in these reports.</p>
               <div className="writing-mode" role="group" aria-label="Writing task">
                 <button aria-pressed={mode === "draft"} className={mode === "draft" ? "active" : ""} disabled={disabled} onClick={() => {setMode("draft"); resetReview(); setError("");}}>Write a new message</button>
                 <button aria-pressed={mode === "improve"} className={mode === "improve" ? "active" : ""} disabled={disabled} onClick={() => {setMode("improve"); resetReview(); setError("");}}>Improve an existing draft</button>

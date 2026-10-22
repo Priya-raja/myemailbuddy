@@ -85,3 +85,20 @@ Recordings upload directly from the browser to FastAPI. There is no Next.js uplo
 7. Test the cold-start notice after Render sleeps, and verify the shared daily allowance survives a service restart.
 
 No raw audio, messages, responses, access codes or IP addresses are included in scope tracing. The configured writing model remains capped at 500 output tokens, with reasoning disabled and no automatic provider retries.
+
+## Private per-device usage reports
+
+Usage aggregates are stored in the existing Upstash database for 90 days, under `buddy:usage:YYYY-MM-DD`. There is no public usage endpoint. The optional UI name is self-reported and visible only in owner reports; it is not a verified account. Blank names are allowed. The browser remembers a random device UUID locally, sends it in `X-Device-ID`, and the server hashes it before aggregation. Clearing storage, changing browsers or spoofing the header changes attribution. IDs are never used to bypass or enforce the shared quota. Optional names travel URL-encoded in `X-Usage-Name`; names and IDs are excluded from scope logs and model prompts.
+
+Generate a private report from the repository root, using the existing ignored `.env` credentials:
+
+```sh
+mkdir -p .usage-reports
+backend/.venv/bin/python backend/scripts/usage_report.py --days 7 --html .usage-reports/latest.html
+```
+
+Open `.usage-reports/latest.html` locally. Add `--date YYYY-MM-DD` for a specific UTC end date; reports cover at most 90 days. Do not publish the report: optional names are personal data. Local HTML exports remain until you delete them; the Redis retention does not remove exported files.
+
+Counters include requests by operation, quota-admitted attempts, successes/failures, blocked requests, provider-reported input/output/total writing tokens, and WAV audio duration in milliseconds. `token_reports` and `audio_duration_reports` distinguish measured values from unavailable measurements. Provider failures can consume unreported usage; these are operational estimates, not a billing ledger. Reporting is best effort and logs a content-free warning if Redis aggregation fails; the separate global quota still fails closed. Completed provider calls are never replayed to repair reporting. The day is assigned at request start in UTC; quota admission around midnight may land on the following UTC day.
+
+These reports start at deployment; historical logs are not backfilled. No message text, audio, draft, recipient address or IP is stored in these reports. Approval and sending are not tracked: sharing opens the user's own mail/WhatsApp app. The production drafting graph does not use the legacy approval checkpointer, so changing `MemorySaver` would not provide usage attribution.

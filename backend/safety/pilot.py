@@ -60,6 +60,7 @@ redis.call('EXPIRE', KEYS[1], ARGV[2])
 return 1
 """
 async def enforce_daily_quota(request: Request) -> None:
+    from .usage import admitted
     if access_required():
         invite_id = getattr(request.state, 'invite_id', None)
         if not invite_id:
@@ -71,6 +72,7 @@ async def enforce_daily_quota(request: Request) -> None:
         # Public visitors need no credential. Keep a durable shared daily ceiling
         # so removing invites does not expose an unlimited provider budget.
         if not production() and not store_configured():
+            admitted()
             return
         try:
             limit = int(os.getenv('PUBLIC_REQUESTS_PER_DAY', '100'))
@@ -87,3 +89,4 @@ async def enforce_daily_quota(request: Request) -> None:
     allowed = await redis_command(['EVAL', DAILY_QUOTA, 1, key, limit, ttl])
     if allowed != 1:
         raise HTTPException(429, exhausted, headers={'Retry-After': str(ttl)})
+    admitted()

@@ -22,11 +22,15 @@ class UsageTrace(BaseCallbackHandler):
 
     def on_llm_end(self, response, **kwargs):
         usage = (response.llm_output or {}).get('token_usage', {})
-        record_scope('allow', self.language, {
+        counts = {
             'input_tokens': usage.get('prompt_tokens', 0),
             'output_tokens': usage.get('completion_tokens', 0),
             'total_tokens': usage.get('total_tokens', 0),
-        })
+        }
+        from .usage import add_tokens
+        if usage:
+            add_tokens(counts)
+        record_scope('allow', self.language, counts)
 
     def on_llm_error(self, error, **kwargs):
         record_scope('allow', self.language, reason='provider_error')

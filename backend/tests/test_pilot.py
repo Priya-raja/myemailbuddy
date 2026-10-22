@@ -8,6 +8,9 @@ from safety import pilot
 
 class PilotTests(unittest.TestCase):
     def setUp(self):
+        report = patch("safety.usage.finish_usage", new_callable=AsyncMock)
+        report.start()
+        self.addCleanup(report.stop)
         self.client = TestClient(main.app)
 
     def test_production_blocks_anonymous_access_and_legacy_sending(self):
