@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 import hashlib
 import logging
 import re
+import unicodedata
 from urllib.parse import unquote
 from .pilot import redis_command, store_configured
 
@@ -29,7 +30,7 @@ def start_usage(request):
     else:
         identity = 'unattributed'
     raw_name = unquote(request.headers.get('x-usage-name', '')[:720])
-    name = re.sub(r"[^\w .'-]", '', raw_name, flags=re.UNICODE).strip()[:60]
+    name = ''.join(char for char in raw_name if char in " .'-" or unicodedata.category(char)[0] in 'LMN').strip()[:60]
     return current_usage.set({'identity': identity, 'name': name, 'day': datetime.now(timezone.utc).date().isoformat(),
                               'operation': OPERATIONS[request.url.path]})
 

@@ -82,3 +82,13 @@ class UsageTests(unittest.TestCase):
         async def run():
             return await asyncio.gather(one(7),one(19))
         self.assertEqual(asyncio.run(run()),[7,19])
+
+    def test_native_script_names_keep_combining_vowels(self):
+        from starlette.requests import Request
+        from urllib.parse import quote
+        request=Request({'type':'http','path':'/api/draft','headers':[(b'x-device-id',DEVICE.encode()),(b'x-usage-name',quote('பிரியா').encode())]})
+        token=usage.start_usage(request)
+        try:
+            self.assertEqual(usage.current_usage.get()['name'],'பிரியா')
+        finally:
+            usage.current_usage.reset(token)
