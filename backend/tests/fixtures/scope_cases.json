@@ -1,0 +1,114 @@
+[
+  {
+    "text": "Write a WhatsApp message requesting leave.",
+    "expected": "allow"
+  },
+  {
+    "text": "Manager ku leave message anuppanum.",
+    "expected": "allow"
+  },
+  {
+    "text": "எனக்கு விடுப்பு கேட்டு மின்னஞ்சல் எழுத வேண்டும்.",
+    "expected": "allow"
+  },
+  {
+    "text": "Write an email asking my teacher to explain gravity.",
+    "expected": "allow"
+  },
+  {
+    "text": "Explain gravity.",
+    "expected": "reject"
+  },
+  {
+    "text": "Naalaiku leave venum.",
+    "expected": "clarify"
+  },
+  {
+    "text": "Improve this.",
+    "expected": "clarify"
+  },
+  {
+    "text": "Research this topic and email me the findings.",
+    "expected": "reject"
+  },
+  {
+    "text": "Write an email and research the best software for us.",
+    "expected": "reject"
+  },
+  {
+    "text": "Please research banking rules and write an email.",
+    "expected": "reject"
+  },
+  {
+    "text": "Draft an email explaining quantum physics.",
+    "expected": "clarify"
+  },
+  {
+    "text": "I have asked for a SWIFT copy from the Intermediate Bank. It will arrive this evening. I have attached the customer's message.",
+    "expected": "allow"
+  },
+  {
+    "text": "The installation is complete and it is ready for use.",
+    "expected": "allow"
+  },
+  {
+    "text": "The new version will be installed this evening.",
+    "expected": "allow"
+  },
+  {
+    "text": "Hi team, I will be late to the meeting today.",
+    "expected": "allow"
+  },
+  {
+    "text": "मैनेजर को छुट्टी का संदेश लिखना है",
+    "expected": "allow"
+  },
+  {
+    "text": "మేనేజర్ కి సెలవు అడగాలి",
+    "expected": "allow"
+  },
+  {
+    "text": "शाळेत रजा मागायची आहे",
+    "expected": "allow"
+  },
+  {
+    "text": "أريد أن أطلب من مديري إجازة غدا",
+    "expected": "allow"
+  },
+  {
+    "text": "اشرح الجاذبية",
+    "expected": "reject"
+  },
+  {
+    "text": "समझाओ गुरुत्वाकर्षण",
+    "expected": "reject"
+  },
+  {
+    "text": "Write an email.",
+    "expected": "clarify"
+  },
+  {
+    "text": "Banana pancake",
+    "expected": "clarify"
+  },
+  {
+    "text": "It is done. I will send it this evening.",
+    "expected": "allow"
+  },
+  {
+    "text": "Please ask him to explain the installation delay.",
+    "expected": "allow"
+  },
+  {
+    "text": "I have completed the research and attached the findings.",
+    "expected": "allow"
+  },
+  {
+    "text": "புதிய பதிப்பு நிறுவப்பட்டது",
+    "expected": "allow"
+  },
+  {
+    "text": "manager-க்கு வந்து நம்ம meeting setup பண்ணலாமா client-ஓட what is your available schedule அப்படின்னு கேட்கணும் email-ல",
+    "expected": "allow"
+  }
+]

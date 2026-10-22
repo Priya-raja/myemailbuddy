@@ -15,16 +15,16 @@ class ApiTests(unittest.TestCase):
         chain = AsyncMock()
         chain.ainvoke.return_value = {'subject': '', 'body': 'Can we meet tomorrow?', 'translation': 'هل يمكننا اللقاء غدًا؟'}
         with patch.dict(main.os.environ, {'GROQ_API_KEY': 'test'}), patch.object(main, 'build_draft_chain', return_value=chain) as build:
-            result = self.client.post('/api/draft', json={'text': 'نتقابل بكرة؟', 'language': 'ar', 'persona': 'friend', 'target': 'whatsapp', 'tone': 'friendly'})
+            result = self.client.post('/api/draft', json={'text': 'أريد اجتماع مع زميلي غدا', 'language': 'ar', 'persona': 'colleague', 'target': 'whatsapp', 'tone': 'friendly'})
         self.assertEqual(result.status_code, 200)
-        build.assert_called_once_with('friend', 'whatsapp', 'friendly', 'ar')
+        build.assert_called_once_with('colleague', 'whatsapp', 'friendly', 'ar')
         self.assertTrue(result.json()['translation'])
 
     def test_invalid_provider_result_is_not_returned(self):
         chain = AsyncMock()
         chain.ainvoke.return_value = {'body': 'Hi'}
         with patch.dict(main.os.environ, {'GROQ_API_KEY': 'test'}), patch.object(main, 'build_draft_chain', return_value=chain):
-            self.assertEqual(self.client.post('/api/draft', json={'text': 'hello'}).status_code, 502)
+            self.assertEqual(self.client.post('/api/draft', json={'text': 'Ask my manager for leave'}).status_code, 502)
 
     def test_arabic_speech_uses_groq(self):
         response = unittest.mock.Mock()
@@ -81,7 +81,7 @@ class ApiTests(unittest.TestCase):
         chain = AsyncMock()
         chain.ainvoke.side_effect = NotFoundError("model not found", response=response, body={})
         with patch.dict(main.os.environ, {"GROQ_API_KEY": "test"}), patch.object(main, "build_draft_chain", return_value=chain):
-            result = self.client.post('/api/draft', json={'text': 'hello'})
+            result = self.client.post('/api/draft', json={'text': 'Ask my manager for leave'})
         self.assertEqual(result.status_code, 503)
         self.assertIn('GROQ_MODEL', result.json()['detail'])
 
@@ -89,6 +89,30 @@ class ApiTests(unittest.TestCase):
         with patch.object(main.ChatGroq, 'bind', return_value=main.llm) as bind:
             main.build_draft_chain('manager', 'email')
         bind.assert_called_once_with(response_format={"type": "json_object"})
+
+    def test_polite_email_gets_subject_when_model_omits_it(self):
+        chain = AsyncMock()
+        chain.ainvoke.return_value = {'body': 'Dear Manager,\n\nThe software installation is complete. It is ready to use.', 'translation': 'நிறுவல் முடிந்தது.'}
+        with patch.dict(main.os.environ, {'GROQ_API_KEY': 'test'}), patch.object(main, 'build_draft_chain', return_value=chain):
+            result = self.client.post('/api/draft', json={'text': 'The installation is complete', 'target': 'email', 'tone': 'polite'})
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.json()['subject'], 'The software installation is complete')
+        chain.ainvoke.assert_awaited_once()
+
+    def test_subject_is_preserved_for_email_and_removed_for_whatsapp(self):
+        payload = {'subject': '  Installation complete  ', 'body': 'It is complete.', 'translation': 'முடிந்தது.'}
+        self.assertEqual(main.normalize_draft(payload, 'email').subject, 'Installation complete')
+        self.assertEqual(main.normalize_draft(payload, 'whatsapp').subject, '')
+
+    def test_truncated_model_output_is_not_returned_as_partial_draft(self):
+        from langchain_core.messages import AIMessage
+        from fastapi import HTTPException
+        truncated = AIMessage(content='{"subject":"Meeting", "body":"Can we meet', response_metadata={'finish_reason': 'length'})
+        with self.assertRaises(HTTPException) as caught:
+            main.require_complete_output(truncated)
+        self.assertEqual(caught.exception.detail['code'], 'response_limit')
+        complete = AIMessage(content='{}', response_metadata={'finish_reason': 'stop'})
+        self.assertIs(main.require_complete_output(complete), complete)
 
 if __name__ == '__main__':
     unittest.main()

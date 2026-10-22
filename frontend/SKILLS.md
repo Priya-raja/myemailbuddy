@@ -24,9 +24,10 @@ Current contracts:
 | --- | --- | --- |
 | `POST /api/transcribe` | Multipart `audio` file and `language` | `transcript` |
 | `POST /api/draft` | JSON `text`, `language`, `persona`, `target`, `tone` | `subject`, `body`, `translation` |
+| `POST /api/improve` | Same as draft; `text` is an existing draft | `subject`, `body`, `translation` |
 | `POST /api/translate` | JSON `text`, `language` | `translation` |
 
-Language codes: `ta-IN`, `hi-IN`, `te-IN`, `mr-IN`, `ar`. Audience values: `manager`, `colleague`, `friend`. Channel values: `email`, `whatsapp`. Tone values: `polite`, `professional`, `friendly`, `confident`, `brief`.
+Language codes: `ta-IN`, `hi-IN`, `te-IN`, `mr-IN`, `ar`. Audience values: `office`, `colleague`, `friend` (`manager` and `school_admin` are legacy aliases for `office`). Channel values: `email`, `whatsapp`. Tone values: `polite`, `professional`, `friendly`, `confident`, `brief`.
 
 ## Work on voice input
 
@@ -51,3 +52,5 @@ Language codes: `ta-IN`, `hi-IN`, `te-IN`, `mr-IN`, `ar`. Audience values: `mana
 - Check native script, romanized input and Arabic text, plus email and WhatsApp formatting.
 - Check keyboard access and mobile layout. Verify recording cleanup when voice behavior changes.
 - Report what was actually tested and distinguish mocked checks from live provider verification.
+
+Handle `detail.status` values `outside_scope`, `needs_details` and `unsafe_message` locally in the toast, retaining user input. Never send a rejected request to a classifier model or retry it automatically. Audience, optional purpose and message details are separate fields.
