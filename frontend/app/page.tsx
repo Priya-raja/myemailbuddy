@@ -379,7 +379,7 @@ export default function Home() {
               <label className="usage-name">Your name (optional)
                 <input autoComplete="off" maxLength={60} value={usageName} onChange={e => setUsageName(e.target.value)} disabled={disabled} placeholder="First name or nickname" aria-describedby="usage-note" />
               </label>
-              <p id="usage-note" className="usage-note">We keep usage totals for 90 days using an anonymous browser ID. Add a name only if you want the app owner to see it with your totals. Messages and recordings are not stored in these reports.</p>
+              <p id="usage-note" className="usage-note">Add a name if you wish.Messages and recordings are not stored in these reports.</p>
               <div className="writing-mode" role="group" aria-label="Writing task">
                 <button aria-pressed={mode === "draft"} className={mode === "draft" ? "active" : ""} disabled={disabled} onClick={() => {setMode("draft"); resetReview(); setError("");}}>Write a new message</button>
                 <button aria-pressed={mode === "improve"} className={mode === "improve" ? "active" : ""} disabled={disabled} onClick={() => {setMode("improve"); resetReview(); setError("");}}>Improve an existing draft</button>
