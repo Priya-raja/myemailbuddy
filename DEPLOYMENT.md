@@ -2,6 +2,12 @@
 
 Repository: https://github.com/Priya-raja/myemailbuddy
 
+Live pilot: https://myemailbuddy.vercel.app
+
+Backend health: https://myemailbuddy-api.onrender.com/health
+
+The first production frontend was deployed with the Vercel CLI from `frontend`. For later CLI releases, run `vercel deploy --prod` from that folder. For Git integration, configure the repository root directory as `frontend` instead.
+
 ## 1. Persistent pilot store
 
 Create an Upstash Redis database on the Free plan and copy its REST URL and write token into the secret environment settings below. Invites and daily usage are stored there; no SQLite or Render filesystem persistence is used. Keep tokens out of Git and all `NEXT_PUBLIC_*` variables.
