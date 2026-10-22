@@ -501,7 +501,7 @@ async def root():
 
 @app.get("/health")
 async def health():
-    if access_required() and not store_configured():
+    if (production() or access_required()) and not store_configured():
         return JSONResponse(status_code=503, content={"status":"not_ready"})
     return {"status":"ok", "access_required":access_required()}
 

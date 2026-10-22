@@ -11,7 +11,7 @@ def production() -> bool:
     return os.getenv('APP_ENV', 'development') == 'production'
 
 def access_required() -> bool:
-    return production() or os.getenv('PILOT_ACCESS_REQUIRED', 'false').lower() == 'true'
+    return os.getenv('PILOT_ACCESS_REQUIRED', 'false').lower() == 'true'
 
 def store_configured() -> bool:
     return bool(os.getenv('UPSTASH_REDIS_REST_URL', '').startswith('https://') and os.getenv('UPSTASH_REDIS_REST_TOKEN'))
@@ -60,15 +60,30 @@ redis.call('EXPIRE', KEYS[1], ARGV[2])
 return 1
 """
 async def enforce_daily_quota(request: Request) -> None:
-    if not access_required():
-        return
-    invite_id = getattr(request.state, 'invite_id', None)
-    if not invite_id:
-        raise HTTPException(401, {'code':'invite_required', 'message':'Enter your pilot access code to continue.'})
+    if access_required():
+        invite_id = getattr(request.state, 'invite_id', None)
+        if not invite_id:
+            raise HTTPException(401, {'code':'invite_required', 'message':'Enter your pilot access code to continue.'})
+        prefix = f'buddy:quota:{invite_id}'
+        limit = request.state.daily_limit
+        exhausted = 'Your daily pilot allowance is used. Please try again tomorrow (UTC).'
+    else:
+        # Public visitors need no credential. Keep a durable shared daily ceiling
+        # so removing invites does not expose an unlimited provider budget.
+        if not production() and not store_configured():
+            return
+        try:
+            limit = int(os.getenv('PUBLIC_REQUESTS_PER_DAY', '100'))
+        except ValueError:
+            raise HTTPException(503, 'Public usage limit is not configured correctly.') from None
+        if not 1 <= limit <= 10000:
+            raise HTTPException(503, 'Public usage limit is not configured correctly.')
+        prefix = 'buddy:quota:public'
+        exhausted = 'Today’s shared free allowance is used. Please try again tomorrow (UTC).'
     now = datetime.now(timezone.utc)
     tomorrow = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
     ttl = max(1, int((tomorrow - now).total_seconds()))
-    key = f'buddy:quota:{invite_id}:{now:%Y%m%d}'
-    allowed = await redis_command(['EVAL', DAILY_QUOTA, 1, key, request.state.daily_limit, ttl])
+    key = f'{prefix}:{now:%Y%m%d}'
+    allowed = await redis_command(['EVAL', DAILY_QUOTA, 1, key, limit, ttl])
     if allowed != 1:
-        raise HTTPException(429, 'Your daily pilot allowance is used. Please try again tomorrow (UTC).', headers={'Retry-After': str(ttl)})
+        raise HTTPException(429, exhausted, headers={'Retry-After': str(ttl)})

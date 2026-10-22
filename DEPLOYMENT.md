@@ -10,7 +10,7 @@ The first production frontend was deployed with the Vercel CLI from `frontend`. 
 
 ## 1. Persistent pilot store
 
-Create an Upstash Redis database on the Free plan and copy its REST URL and write token into the secret environment settings below. Invites and daily usage are stored there; no SQLite or Render filesystem persistence is used. Keep tokens out of Git and all `NEXT_PUBLIC_*` variables.
+Create an Upstash Redis database on the Free plan and copy its REST URL and write token into the secret environment settings below. Optional invites and shared public daily usage are stored there; no SQLite or Render filesystem persistence is used. Keep tokens out of Git and all `NEXT_PUBLIC_*` variables.
 
 ## 2. Render backend
 
@@ -28,6 +28,8 @@ Import this repository as a Blueprint using the root `render.yaml`, or create a 
 Environment settings:
 
 - `APP_ENV=production`
+- `PILOT_ACCESS_REQUIRED=false`: public drafting without access codes.
+- `PUBLIC_REQUESTS_PER_DAY=100`: shared daily ceiling across all public visitors.
 - `PYTHON_VERSION=3.13.13`
 - `GROQ_MODEL=qwen/qwen3.8-27b`
 - `GROQ_API_KEY` and `SARVAM_API_KEY`: backend secrets.
@@ -36,9 +38,17 @@ Environment settings:
 
 The health endpoint returns 503 until the external pilot-store settings exist. It makes no model call. Copy the actual assigned Render HTTPS URL after provisioning; do not assume that a service name determines an available public hostname.
 
-Production requires an active pilot invite for every `/api/` request. Legacy SMTP send and workflow routes are disabled in production. The UI still opens user-controlled mail/WhatsApp drafts. Do not add Gmail SMTP credentials to Render.
+Production allows public drafting by default. Set `PILOT_ACCESS_REQUIRED=true` only to restore optional invite-only access. Keep Upstash configured in both modes; public requests are capped atomically across all backend processes. Legacy SMTP send and workflow routes are disabled in production. The UI still opens user-controlled mail/WhatsApp drafts. Do not add Gmail SMTP credentials to Render.
 
-## 3. Create a pilot invite
+## 3. Public access and optional invites
+
+For the existing Render service, explicitly set `PILOT_ACCESS_REQUIRED=false` and `PUBLIC_REQUESTS_PER_DAY=100` in its environment and redeploy the updated backend. Merely changing environment variables on the old code does not remove its forced production invite requirement. The frontend already handles anonymous requests; no frontend changes are needed.
+
+The 100-operation allowance is shared by all visitors and resets at midnight UTC (4 AM Dubai). Transcription, drafting, improving, and translation each use one operation. Admitted provider failures still consume an operation. Existing hourly limits remain in place but are process-local and use the network client address for anonymous visitors; they are not a durable per-person quota. Public visitors can share the same proxy address. The global Redis quota remains authoritative.
+
+The health check verifies storage configuration exists, not Redis reachability; storage failures block writing with 503.
+
+For optional invite-only access, set `PILOT_ACCESS_REQUIRED=true`, then create invites:
 
 With the Upstash REST URL/token in your local root `.env` (or shell environment), run:
 
@@ -67,11 +77,11 @@ Recordings upload directly from the browser to FastAPI. There is no Next.js uplo
 ## 5. Verify before inviting testers
 
 1. `/health` returns `status: ok` over HTTPS.
-2. Anonymous drafting/transcription returns 401; legacy send endpoints return 404.
-3. A valid invite passes; revoked/expired codes fail.
+2. With public mode, anonymous valid drafting/transcription can proceed without a code; legacy send endpoints still return 404.
+3. Exhaust the configured shared public allowance using mocked providers and verify 429 before any further provider calls. If optional invite mode is enabled, verify valid/revoked/expired codes.
 4. A fictional short draft includes subject, greeting, body, closing and native translation.
 5. Check CORS from the actual Vercel origin and reject an unapproved origin.
 6. Test recording on HTTPS, copy/open-draft clearing, and PWA installation.
-7. Test the cold-start notice after Render sleeps, and verify daily allowance survives a service restart.
+7. Test the cold-start notice after Render sleeps, and verify the shared daily allowance survives a service restart.
 
 No raw audio, messages, responses, access codes or IP addresses are included in scope tracing. The configured writing model remains capped at 500 output tokens, with reasoning disabled and no automatic provider retries.

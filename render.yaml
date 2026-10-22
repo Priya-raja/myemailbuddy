@@ -12,6 +12,10 @@ services:
         value: 3.13.13
       - key: APP_ENV
         value: production
+      - key: PILOT_ACCESS_REQUIRED
+        value: "false"
+      - key: PUBLIC_REQUESTS_PER_DAY
+        value: "100"
       - key: GROQ_MODEL
         value: qwen/qwen3.8-27b
       - key: GROQ_API_KEY
