@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { deviceId } from "../lib/identity";
+import { getDemoId } from "../lib/identity";
 import { API_BASE, ensureServiceReady } from "../lib/service";
 import {
   MAX_RECORDING_MS,
@@ -70,7 +70,7 @@ class RequestError extends Error {
 async function request(path: string, body: unknown, form = false, accessCode = "", onStarting?: (value: boolean) => void, usageName = "") {
   await ensureServiceReady(onStarting);
   const headers: Record<string, string> = form ? {} : { "Content-Type": "application/json" };
-  headers["X-Device-ID"] = deviceId();
+  headers["X-Device-ID"] = getDemoId();
   if (usageName.trim()) headers["X-Usage-Name"] = encodeURIComponent(usageName.trim());
   if (accessCode.trim()) headers.Authorization = `Bearer ${accessCode.trim()}`;
   const response = await fetch(`${API_BASE}${path}`, {
@@ -120,6 +120,7 @@ export default function Home() {
 
   useEffect(() => {
     mounted.current = true;
+    getDemoId();
     return () => {
       mounted.current = false;
       if (recordTimer.current) clearTimeout(recordTimer.current);
@@ -156,7 +157,7 @@ export default function Home() {
     setError("");
     try {
       setDraft(
-        await callApi(mode === "improve" ? "/api/improve" : "/api/draft", { text, language, persona, target, tone, purpose }),
+        await callApi(mode === "improve" ? "/api/improve" : "/api/draft", { text, language, persona, target, tone, purpose, demo_id: getDemoId() }),
       );
       setText("");
       setReviewed(false);

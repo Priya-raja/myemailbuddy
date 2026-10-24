@@ -105,7 +105,7 @@ These reports start at deployment; historical logs are not backfilled. No messag
 
 ## Three-attempt public demo
 
-Production defaults to `DEMO_LIMIT_ENABLED=true`. Public `/api/draft` and `/api/improve` requests share a lifetime cap of three admitted attempts per browser UUID. API clients may supply the UUID in `demo_id`; the existing browser already sends `X-Device-ID`. The fourth request returns HTTP 403 with code `demo_limit` and message “Demo limit reached. Please contact Priya for full access.” The UI then offers the private access-code form.
+Production defaults to `DEMO_LIMIT_ENABLED=true`. Public `/api/draft` and `/api/improve` requests share a lifetime cap of three admitted attempts per browser UUID. API clients may supply the UUID in `demo_id`; the browser sends the same persistent UUID in `X-Device-ID` and the drafting/improvement JSON `demo_id`. The frontend initializes it on first load, stores it under `demo_id`, and reuses the older `emailbuddy-device-id` when present so migration does not reset existing counters. The fourth request returns HTTP 403 with code `demo_limit` and message “Demo limit reached. Please contact Priya for full access.” The UI then offers the private access-code form.
 
 The counter lives at `buddy:demo:<sha256>` in Upstash and has no automatic reset. Scope rejection and exhausted daily quotas do not consume an attempt. Provider failures after quota admission do consume an attempt, matching the existing attempt-based daily allowance. One Lua script checks and increments the public daily quota and the demo counter atomically; restarts and concurrent requests cannot reset or overrun the same ID's cap.
 
