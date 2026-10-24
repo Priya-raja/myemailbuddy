@@ -252,6 +252,7 @@ class DraftRequest(BaseModel):
     tone: Literal["polite", "professional", "friendly", "confident", "brief"] = "polite"
     language: Literal["ta-IN", "hi-IN", "te-IN", "mr-IN", "ar"] = "ta-IN"
     purpose: Literal["", "status_update", "request", "leave", "follow_up", "thank_you", "other"] = ""
+    demo_id: str = Field(default="", max_length=36)
 
     @field_validator("persona", mode="before")
     @classmethod
@@ -263,7 +264,7 @@ class DraftRequest(BaseModel):
 async def generate_draft(req: DraftRequest, request: Request):
     require_safe_message(req.text, purpose=req.purpose, language=req.language, trace=True)
     enforce_quota(request)
-    await enforce_daily_quota(request)
+    await enforce_daily_quota(request, demo_id=req.demo_id)
     if not os.getenv("GROQ_API_KEY"):
         raise HTTPException(503, "GROQ_API_KEY is missing.")
     try:
@@ -278,7 +279,7 @@ async def generate_draft(req: DraftRequest, request: Request):
 async def improve_draft(req: DraftRequest, request: Request):
     require_safe_message(req.text, mode="improve", language=req.language, trace=True)
     enforce_quota(request)
-    await enforce_daily_quota(request)
+    await enforce_daily_quota(request, demo_id=req.demo_id)
     if not os.getenv("GROQ_API_KEY"):
         raise HTTPException(503, "GROQ_API_KEY is missing.")
     try:
@@ -478,7 +479,7 @@ class ResumeWorkflowRequest(BaseModel):
 async def run_workflow(req: RunWorkflowRequest, request: Request):
     require_safe_message(req.text, purpose=req.purpose, language=req.language, trace=True)
     enforce_quota(request)
-    await enforce_daily_quota(request)
+    await enforce_daily_quota(request, demo_id=req.demo_id)
     config = {"configurable": {"thread_id": req.thread_id}}
     initial_state: WorkflowState = {
         "original_text": req.text,

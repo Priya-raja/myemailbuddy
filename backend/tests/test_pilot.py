@@ -8,6 +8,9 @@ from safety import pilot
 
 class PilotTests(unittest.TestCase):
     def setUp(self):
+        demo = patch.dict(main.os.environ, {"DEMO_LIMIT_ENABLED":"false"})
+        demo.start()
+        self.addCleanup(demo.stop)
         report = patch("safety.usage.finish_usage", new_callable=AsyncMock)
         report.start()
         self.addCleanup(report.stop)

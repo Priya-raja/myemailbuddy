@@ -14,7 +14,7 @@ DEVICE = '12345678-1234-4234-8234-123456789abc'
 
 class UsageTests(unittest.TestCase):
     def setUp(self):
-        self.env = patch.dict(main.os.environ, {'APP_ENV':'production', 'PILOT_ACCESS_REQUIRED':'false', 'GROQ_API_KEY':'test', 'UPSTASH_REDIS_REST_URL':'https://example.invalid','UPSTASH_REDIS_REST_TOKEN':'test'})
+        self.env = patch.dict(main.os.environ, {'DEMO_LIMIT_ENABLED':'false','APP_ENV':'production', 'PILOT_ACCESS_REQUIRED':'false', 'GROQ_API_KEY':'test', 'UPSTASH_REDIS_REST_URL':'https://example.invalid','UPSTASH_REDIS_REST_TOKEN':'test'})
         self.env.start()
         self.addCleanup(self.env.stop)
         self.client = TestClient(main.app)

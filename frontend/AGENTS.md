@@ -66,3 +66,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Frontend: Vercel; backend: Render; persistent pilot invite and daily quota store: Upstash Redis. Read the root `DEPLOYMENT.md`.
 - Show the cold-start notice while checking backend health. Retry health checks only, never automatically replay writing or audio requests.
 - Upload audio directly to FastAPI. Pilot access codes stay in page memory and travel only in Bearer headers.
+
+- Public demo drafting and improving share three lifetime attempts per browser ID. A `demo_limit` error opens the private access-code form. Verified private codes retain their own daily quotas. Browser IDs are self-asserted and are not authentication.

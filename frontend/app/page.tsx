@@ -147,7 +147,7 @@ export default function Home() {
     finally { setBusy(""); }
   }
   function showRequestError(error: unknown) {
-    if (error instanceof RequestError && error.code === 'invite_required') setAccessRequired(true);
+    if (error instanceof RequestError && ['invite_required', 'demo_limit'].includes(error.code || '')) setAccessRequired(true);
     setWarning(error instanceof RequestError && ['unsafe_message', 'out_of_scope', 'empty_message', 'needs_details'].includes(error.code || ''));
     setError(error instanceof Error ? error.message : 'Please try again.');
   }

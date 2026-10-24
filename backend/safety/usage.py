@@ -1,6 +1,6 @@
 """Private, content-free daily usage aggregates in Redis, retained for 90 days.
 
-Device IDs are self-asserted analytics labels, never authentication or quotas.
+Device IDs are self-asserted labels, never authentication. The demo cap is a soft limit.
 """
 from contextvars import ContextVar
 from datetime import datetime, timezone

@@ -1,4 +1,4 @@
-// Analytics label only: changing browser storage changes this ID. Never use it for access control.
+// Self-asserted browser label for analytics and a soft demo cap; never authentication.
 let sessionDeviceId = '';
 export function deviceId(): string {
   if (sessionDeviceId) return sessionDeviceId;
