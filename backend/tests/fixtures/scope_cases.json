@@ -110,5 +110,45 @@
   {
     "text": "manager-க்கு வந்து நம்ம meeting setup பண்ணலாமா client-ஓட what is your available schedule அப்படின்னு கேட்கணும் email-ல",
     "expected": "allow"
+  },
+  {
+    "text": "இன்னைக்கு எங்களுக்கு dance program இருக்கு, ma'am வந்து tuition attend பண்ண முடியாது.",
+    "expected": "allow"
+  },
+  {
+    "text": "இன்னைக்கு எங்களுக்கு dance program இருக்கு, ma'am வந்து tuition attend பண்ண முடியாது. to tution teacher",
+    "expected": "allow"
+  },
+  {
+    "text": "இன்று நடன நிகழ்ச்சி இருப்பதால் டியூஷனுக்கு வர முடியாது.",
+    "expected": "allow"
+  },
+  {
+    "text": "வகுப்பில் கலந்துகொள்ள முடியவில்லை.",
+    "expected": "allow"
+  },
+  {
+    "text": "Innaiku tuition attend panna mudiyadhu, dance program irukku.",
+    "expected": "allow"
+  },
+  {
+    "text": "Cannot attend tuition today because of a dance program.",
+    "expected": "allow"
+  },
+  {
+    "text": "Tuition teacher.",
+    "expected": "clarify"
+  },
+  {
+    "text": "What is tuition?",
+    "expected": "reject"
+  },
+  {
+    "text": "Research dance techniques and email my tuition teacher the findings.",
+    "expected": "reject"
+  },
+  {
+    "text": "Cannot attend tuition today, and research dance techniques for me.",
+    "expected": "reject"
   }
 ]

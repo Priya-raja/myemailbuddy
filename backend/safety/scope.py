@@ -56,6 +56,18 @@ MIXED_RESEARCH = (
     r'(?:^|[.!?]\s*)(?:explain|research|calculate|solve)\b',
     r'(?:மற்றும்|பிறகு).*ஆராய்ச்சி|(?:और|फिर).*शोध|(?:మరియు|తర్వాత).*పరిశోధన|(?:ثم|و).*ابحث',
 )
+# Attendance facts are valid message content even without a "write" verb.
+# Require both a class/meeting context and an explicit inability to attend.
+ATTENDANCE_CONTEXT = (
+    r'\b(?:tuition|tution|class(?:es)?|lesson|meeting|training)\b',
+    r'டியூஷ|டியுஷ|டியூச|வகுப்|பாடம்|கூட்ட',
+)
+ATTENDANCE_ABSENCE = (
+    r"\b(?:cannot|can[’']t|couldn[’']t|unable to|not able to|won[’']t be able to)\s+(?:attend|come|join|make it)\b",
+    r'(?:வர|கலந்து\s*கொள்ள|பங்கேற்க|(?:attend|அட்டெண்ட்)\s*(?:பண்ண|செய்ய))\s*(?:முடியாது|முடியவில்லை|இயலாது)',
+    r'\b(?:vara|varave|kalandhuka|attend\s+panna)\s*(?:mudiyadhu|mudiyathu|mudiyala|mudiyavillai)\b',
+)
+
 # Evidence of supplied content, rather than a request for facts from the model.
 SUPPLIED_CONTENT = (
     r'\b(?:i|we|it|the|my|our|he|she|they)\b.{0,140}\b(?:have|has|am|are|is|was|were|will|completed|installed|asked|sent|attached|received|pending|ready|done)\b',
@@ -80,6 +92,8 @@ def classify_scope(text: str, *, purpose: str = '', mode: str = 'draft') -> Scop
         if len(text.split()) >= 4 or matches(SUPPLIED_CONTENT, text):
             return {'decision': 'allow', 'reason': 'existing_content'}
         return {'decision': 'clarify', 'reason': 'missing_details'}
+    if matches(ATTENDANCE_CONTEXT, text) and matches(ATTENDANCE_ABSENCE, text):
+        return {'decision': 'allow', 'reason': 'supplied_attendance_facts'}
     writing = matches(WRITE_ACTIONS, text)
     message = matches(MESSAGE_TYPES, text)
     purpose_signal = matches(MESSAGE_PURPOSES, text)

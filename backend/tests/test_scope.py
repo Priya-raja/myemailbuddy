@@ -65,3 +65,13 @@ class ScopeTests(unittest.TestCase):
         self.assertEqual(first['token_usage']['total_tokens'], 0)
         self.assertEqual(second['token_usage']['total_tokens'], 20)
         self.assertNotIn('DO NOT LOG', str(logs.output))
+
+    def test_mixed_tamil_tuition_absence_reaches_drafting_with_facts_intact(self):
+        text = "இன்னைக்கு எங்களுக்கு dance program இருக்கு, ma'am வந்து tuition attend பண்ண முடியாது."
+        chain = AsyncMock()
+        chain.ainvoke.return_value = {'subject': 'Unable to attend tuition today', 'body': 'Dear [Name],\n\nWe have a dance program today, so we will be unable to attend tuition.\n\nThank you.', 'translation': 'இன்று நடன நிகழ்ச்சி இருப்பதால் டியூஷனுக்கு வர முடியாது.'}
+        with patch.dict(main.os.environ, {'GROQ_API_KEY':'test'}), patch.object(main, 'build_draft_chain', return_value=chain):
+            result = self.client.post('/api/draft', json={'text':text, 'language':'ta-IN','persona':'office','target':'email','tone':'polite'})
+        self.assertEqual(result.status_code,200)
+        chain.ainvoke.assert_awaited_once()
+        self.assertEqual(chain.ainvoke.await_args.args[0]['text'],text)
