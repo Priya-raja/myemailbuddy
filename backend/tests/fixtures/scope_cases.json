@@ -150,5 +150,45 @@
   {
     "text": "Cannot attend tuition today, and research dance techniques for me.",
     "expected": "reject"
+  },
+  {
+    "text": "मलाई भोलि व्यक्तिगत कामको लागि एक दिन बिदा चाहिन्छ। म्यानेजरलाई इमेल लेखिदिनुहोस्।",
+    "expected": "allow"
+  },
+  {
+    "text": "म्यानेजरलाई बिदाको सन्देश लेखिदिनुहोस्।",
+    "expected": "allow"
+  },
+  {
+    "text": "Bholi personal kaam chha, manager lai ek din bida ko message lekhidinu.",
+    "expected": "allow"
+  },
+  {
+    "text": "Manager lai bholi bida ko message pathaunu.",
+    "expected": "allow"
+  },
+  {
+    "text": "काम सम्पन्न भएको छ।",
+    "expected": "allow"
+  },
+  {
+    "text": "भोलि बिदा चाहिन्छ।",
+    "expected": "clarify"
+  },
+  {
+    "text": "कृपया व्याख्या गर्नुहोस्: गुरुत्वाकर्षण।",
+    "expected": "reject"
+  },
+  {
+    "text": "Ke ho gravity?",
+    "expected": "reject"
+  },
+  {
+    "text": "इमेल लेख्नुहोस् र अनुसन्धान गर्नुहोस्।",
+    "expected": "reject"
+  },
+  {
+    "text": "एउटा इमेल lekhidinu ra research garera findings pathaunu.",
+    "expected": "reject"
   }
 ]

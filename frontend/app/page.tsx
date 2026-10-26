@@ -55,6 +55,12 @@ const languages = [
       "Udya personal kaam aahe, manager la ek divas sutti magaychi aahe.",
   },
   {
+    code: "ne-IN",
+    name: "Nepali",
+    native: "नेपाली",
+    example: "मलाई भोलि व्यक्तिगत कामको लागि एक दिन बिदा चाहिन्छ। म्यानेजरलाई इमेल लेखिदिनुहोस्।",
+  },
+  {
     code: "ar",
     name: "Arabic",
     native: "العربية",
@@ -670,7 +676,7 @@ export default function Home() {
             <AudioLines size={19} />
             <span>Speak naturally. Mix languages. Be yourself.</span>
             <span className="bottom-languages">
-              Tamil · Hindi · Telugu · Marathi · Arabic
+              Tamil · Hindi · Telugu · Marathi · Nepali · Arabic
             </span>
           </div>
         </main>

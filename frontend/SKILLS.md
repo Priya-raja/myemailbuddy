@@ -27,7 +27,7 @@ Current contracts:
 | `POST /api/improve` | Same as draft; `text` is an existing draft | `subject`, `body`, `translation` |
 | `POST /api/translate` | JSON `text`, `language` | `translation` |
 
-Language codes: `ta-IN`, `hi-IN`, `te-IN`, `mr-IN`, `ar`. Audience values: `office`, `colleague`, `friend` (`manager` and `school_admin` are legacy aliases for `office`). Channel values: `email`, `whatsapp`. Tone values: `polite`, `professional`, `friendly`, `confident`, `brief`.
+Language codes: `ta-IN`, `hi-IN`, `te-IN`, `mr-IN`, `ne-IN`, `ar`. Audience values: `office`, `colleague`, `friend` (`manager` and `school_admin` are legacy aliases for `office`). Channel values: `email`, `whatsapp`. Tone values: `polite`, `professional`, `friendly`, `confident`, `brief`.
 
 ## Work on voice input
 

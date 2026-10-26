@@ -87,9 +87,9 @@ llm = ChatGroq(
 async def transcribe(
     request: Request,
     audio: UploadFile = File(...),
-    language: str = Form(...),  # ta-IN, hi-IN, te-IN, mr-IN, ar
+    language: str = Form(...),  # ta-IN, hi-IN, te-IN, mr-IN, ne-IN, ar
 ):
-    if language not in {"ta-IN", "hi-IN", "te-IN", "mr-IN", "ar"}:
+    if language not in {"ta-IN", "hi-IN", "te-IN", "mr-IN", "ne-IN", "ar"}:
         raise HTTPException(422, "Choose a supported language.")
     audio_bytes = await audio.read(25 * 1024 * 1024 + 1)
     if not audio_bytes or len(audio_bytes) > 25 * 1024 * 1024:
@@ -140,7 +140,7 @@ async def transcribe(
 # ============================================================
 draft_parser = JsonOutputParser()
 
-LANGUAGES = {"ta-IN": "Tamil", "hi-IN": "Hindi", "te-IN": "Telugu", "mr-IN": "Marathi", "ar": "Arabic"}
+LANGUAGES = {"ta-IN": "Tamil", "hi-IN": "Hindi", "te-IN": "Telugu", "mr-IN": "Marathi", "ne-IN": "Nepali", "ar": "Arabic"}
 
 class DraftResult(BaseModel):
     subject: str = ""
@@ -250,7 +250,7 @@ class DraftRequest(BaseModel):
     persona: Literal["office", "colleague", "friend"] = "office"
     target: Literal["email", "whatsapp"] = "email"
     tone: Literal["polite", "professional", "friendly", "confident", "brief"] = "polite"
-    language: Literal["ta-IN", "hi-IN", "te-IN", "mr-IN", "ar"] = "ta-IN"
+    language: Literal["ta-IN", "hi-IN", "te-IN", "mr-IN", "ne-IN", "ar"] = "ta-IN"
     purpose: Literal["", "status_update", "request", "leave", "follow_up", "thank_you", "other"] = ""
     demo_id: str = Field(default="", max_length=36)
 
@@ -315,7 +315,7 @@ drafting_graph = drafting_workflow.compile()
 
 class TranslationRequest(BaseModel):
     text: str = Field(min_length=1, max_length=12000)
-    language: Literal["ta-IN", "hi-IN", "te-IN", "mr-IN", "ar"]
+    language: Literal["ta-IN", "hi-IN", "te-IN", "mr-IN", "ne-IN", "ar"]
 
 @app.post("/api/translate")
 async def translate_draft(req: TranslationRequest, request: Request):

@@ -19,6 +19,8 @@ def matches(patterns: tuple[str, ...], text: str) -> bool:
     return any(re.search(pattern, text, re.I) for pattern in patterns)
 
 WRITE_ACTIONS = (
+    r'लेख|पठाउ|पठाइ|जवाफ|अनुवाद',
+    r'\b(?:lekh\w*|pathau\w*|bhanid\w*)\b',
     r'\b(write|draft|compose|rewrite|rephrase|polish|proofread|reply|fix|correct|improve|translate|shorten|ask|tell)\b',
     r'\b(ezhuth\w*|eluth\w*|anupp\w*|keka\w*|kekka\w*|maang\w*|adag\w*|sang\w*)\b',
     r'எழுத|திருத்த|அனுப்ப|பதிலளி|மொழிபெயர்|கேட்க',
@@ -27,21 +29,28 @@ WRITE_ACTIONS = (
     r'اكتب|أكتب|صياغة|صحح|صحّح|ترجم|اختصر|أطلب|اطلب',
 )
 MESSAGE_TYPES = (
+    r'इमेल|सन्देश|जवाफ',
     r'\b(e-?mail|whats\s*app|message|msg|letter|reply|draft)\b',
     r'மின்னஞ்சல்|செய்தி|கடிதம்|பதில்|ईमेल|मेल|संदेश|मैसेज|पत्र|जवाब',
     r'ఈమెయిల్|మెయిల్|సందేశం|మెసేజ్|లేఖ|رسالة|بريد|إيميل|ايميل|واتساب',
 )
 RECIPIENTS = (
+    r'म्यानेजर|प्रबन्धक|सहकर्मी|साथी',
+    r'\b(?:sathi|sahakarmi|prabandhak|shikshak)\b',
     r'\b(manager|colleague|coworker|team|teacher|school|admin|friend|client|customer|supervisor|principal)\b',
     r'மேலாள|ஆசிரிய|பள்ளி|நண்ப|मैनेजर|शिक्षक|शाळ|मित्र|మేనేజర్|స్నేహిత|مدير|زميل|صديق|مدرس',
 )
 MESSAGE_PURPOSES = (
+    r'बिदा|तलब|ढिलो|बैठक|भुक्तानी',
+    r'\b(?:bida|bidha|talab|dhilo|baithak)\b',
     r'\b(leave|salary|late|permission|payment|interview|follow.?up|receipt|meeting|fee|installation|update|deadline)\b',
     r'\b(vidumurai|viduppu|sambalam|chhutti|sutti|selavu|kaam|pani|velai)\b',
     r'விடுப்பு|சம்பளம்|அனுமதி|தாமத|छुट्टी|वेतन|तनख्वाह|अनुमति|रजा|सुट्टी',
     r'సెలవు|జీతం|అనుమతి|ఆలస్యం|إجازة|راتب|إذن|تأخير|اجتماع',
 )
 DIRECT_QA = (
+    r'^(?:कृपया\s*)?(?:के हो|किन|कसरी|कहिले|कहाँ|को हो|बुझा|व्याख्या|अनुसन्धान|गणना)',
+    r'^(?:kripaya\s+)?(?:ke ho|kina|kasari|kahile|kaha|bujhau|anusandhan)\b',
     r'^(?:(?:please|can you|could you|would you)\s+)?(?:office:\s*)?(?:what|why|who|when|where|how|explain|research|calculate|solve|summari[sz]e|teach me|tell me about)\b',
     r'^(?:please\s+)?(?:write|generate)\s+(?:an?\s+)?(?:essay|story|poem|code)\b',
     r'^give me\b.*\b(recipe|horoscope|stock price)\b',
@@ -51,6 +60,8 @@ DIRECT_QA = (
     r'^(ما هو|ما هي|لماذا|كيف|اشرح|احسب|ابحث)',
 )
 MIXED_RESEARCH = (
+    r'(?:^|र\s+|त्यसपछि\s+)(?:अनुसन्धान|खोजी)\s*(?:गर|गरेर|गर्न)',
+    r'(?:^|\b(?:ra|ani|tyaspachi)\s+)(?:research|anusandhan|khoji)\s*(?:gara|garera|garnu)\b',
     r'(?:^|\b(?:and|then|also|first|before|after)\s+)(?:please\s+)?(?:research|look up|search for|investigate)\b',
     r'\b(?:researching|look up|search the web|find the facts|email me the findings)\b',
     r'(?:^|[.!?]\s*)(?:explain|research|calculate|solve)\b',
@@ -70,6 +81,8 @@ ATTENDANCE_ABSENCE = (
 
 # Evidence of supplied content, rather than a request for facts from the model.
 SUPPLIED_CONTENT = (
+    r'(?:म|हामी|मैले|हामीले)\s.{0,120}(?:छु|छौं|छौँ|सक्दिन|सक्दैन|सकेको|गरेँ|हुनेछ|भएको)',
+    r'काम\s*(?:पूरा|सम्पन्न|सकिएको)',
     r'\b(?:i|we|it|the|my|our|he|she|they)\b.{0,140}\b(?:have|has|am|are|is|was|were|will|completed|installed|asked|sent|attached|received|pending|ready|done)\b',
     r'\b(?:please ask|please send|could you approve|i want to ask|the installation|the new version)\b',
     r'நிறுவப்பட்டது|முடிந்தது|அனுப்பிய|இணைத்த|வேலை|పూర్తయింది|పంపాను|काम पूर्ण|जोडले|تم تثبيت|أرفقت|اكتمل',

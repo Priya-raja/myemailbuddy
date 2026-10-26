@@ -4,7 +4,7 @@ These instructions apply to files under `frontend/`. Read [SKILLS.md](./SKILLS.m
 
 ## Product
 
-My Email Buddy helps nonnative English speakers turn everyday thoughts into English emails and WhatsApp messages. Support Tamil, Hindi, Telugu, Marathi and Arabic, including native scripts, romanized input such as Tanglish and Hinglish, and mixed English.
+My Email Buddy helps nonnative English speakers turn everyday thoughts into English emails and WhatsApp messages. Support Tamil, Hindi, Telugu, Marathi, Nepali and Arabic, including native scripts, romanized input such as Tanglish and Hinglish, and mixed English.
 
 - Let users choose Office, A colleague or A friend (Office includes formal school administration messages), message channel, and tone.
 - Keep the original intent and make the draft editable.
